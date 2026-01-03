@@ -70,6 +70,10 @@ static const struct mInputPlatformInfo _mGUIKeyInfo = {
 		[mGUI_INPUT_FAST_FORWARD_HELD] = "Fast forward (held)",
 		[mGUI_INPUT_FAST_FORWARD_TOGGLE] = "Fast forward (toggle)",
 		[mGUI_INPUT_MUTE_TOGGLE] = "Mute (toggle)",
+		[mGUI_INPUT_OPEN_MENU] = "Open menu",
+		[mGUI_INPUT_QUICK_SAVE] = "Quicksave",
+		[mGUI_INPUT_QUICK_LOAD] = "Quickload",
+		//[mGUI_INPUT_REWIND] = "Rewind",
 	},
 	.nKeys = GUI_INPUT_MAX
 };
@@ -519,9 +523,23 @@ void mGUIRun(struct mGUIRunner* runner, const char* path) {
 			uint32_t guiKeys;
 			uint32_t heldKeys;
 			GUIPollInput(&runner->params, &guiKeys, &heldKeys);
-			if (guiKeys & (1 << GUI_INPUT_CANCEL)) {
+			//if (guiKeys & (1 << GUI_INPUT_CANCEL)) { // open menu with X
+			//	break;
+			//}
+			if (guiKeys & (1 << mGUI_INPUT_OPEN_MENU)) {
 				break;
 			}
+			if (guiKeys & (1 << mGUI_INPUT_QUICK_SAVE)) {
+				mCoreSaveStateNamed(runner->core, runner->autosave.buffer, SAVESTATE_SAVEDATA | SAVESTATE_RTC | SAVESTATE_METADATA);
+				GUIFontPrintf(runner->params.font, 0, GUIFontHeight(runner->params.font), GUI_ALIGN_LEFT, 0x7FFFFFFF, "Quicksave");
+			}
+			if (guiKeys & (1 << mGUI_INPUT_QUICK_LOAD)) {
+				mCoreLoadStateNamed(runner->core, runner->autosave.buffer, SAVESTATE_SAVEDATA | SAVESTATE_RTC | SAVESTATE_METADATA);
+				GUIFontPrintf(runner->params.font, 0, GUIFontHeight(runner->params.font), GUI_ALIGN_LEFT, 0x7FFFFFFF, "Quickload");
+			}
+			//if (guiKeys & (1 << mGUI_INPUT_REWIND)) {
+			//	//
+			//}
 			if (guiKeys & (1 << mGUI_INPUT_INCREASE_BRIGHTNESS)) {
 				if (runner->luminanceSource.luxLevel < 10) {
 					++runner->luminanceSource.luxLevel;
